@@ -1,10 +1,3 @@
-function index(i, j) {
-	if (i < 0 || j < 0 || i > cols - 1 || j > rows - 1) {
-		return -1;
-	}
-	return i + j * cols;
-}
-
 function Cell(i, j, size, canvasName) {
 	this.i = i
 	this.j = j
@@ -95,15 +88,6 @@ function Cell(i, j, size, canvasName) {
 
 		this.number = total
 		// console.log( this.number )
-	}
-
-	this.clicked = (x, y) => {
-		return (
-			x > this.x &&
-			x < this.x + this.size &&
-			y > this.y &&
-			y < this.y + this.size
-		)
 	}
 
 	this.reveal = () => {

@@ -1,5 +1,5 @@
 let grid = []
-let w = 30 // size of squares
+let cellSize = 30 // size of squares
 let gameOver
 let cols, rows
 let difficulty = 50
@@ -17,12 +17,14 @@ function setup(canvasName) {
 	grid = []
 	draw = new Shapes(canvasName)
 
-	cols = Math.floor(draw.canvas.width / w)
-	rows = Math.floor(draw.canvas.height / w)
+	cols = Math.floor(draw.canvas.width / cellSize)
+	rows = Math.floor(draw.canvas.height / cellSize)
+	// console.log(cols);
+	// console.log(rows);
 
 	for (let j = 0; j < rows; j++) {
 		for (let i = 0; i < cols; i++) {
-			grid.push(new Cell(i, j, w, canvasName))
+			grid.push(new Cell(i, j, cellSize, canvasName))
 		}
 	}
 
@@ -71,45 +73,40 @@ function update() {
 
 }
 
+function index(i, j) {
+	if (i < 0 || j < 0 || i > cols - 1 || j > rows - 1) {
+		return -1;
+	}
+	return i + j * cols;
+}
+
 function mouseClick(event) {
 	// console.log(event);
 
-	let x = event.x - draw.canvas.offsetLeft
-	let y = event.y - draw.canvas.offsetTop
+	let x = Math.floor((event.x - draw.canvas.offsetLeft) / cellSize)
+	let y = Math.floor((event.y - draw.canvas.offsetTop) / cellSize)
 
-	for (let i = 0; i < grid.length && !gameOver; i++) {
+	if (event.shiftKey) {
+		grid[index(x, y)].flag()
+	} else {
 
-		if (event.shiftKey && grid[i].clicked(x, y)) {
-			grid[i].flag()
-		} else if (grid[i].clicked(x, y)) {
-			/*
-              if cell with nothing around it is clicked
-              click on everything around it until a non-zero number is found
-            */
+		grid[index(x, y)].reveal();
 
-			grid[i].reveal();
-
-			// if (grid[i].flagged) {
-			//   grid[i].flagged = false;
-			// }
-
-			if (grid[i].bomb) {
-				gameOver = true;
-				loser = document.getElementById("loser")
-				loser.style.display = "inline"
-				for (let i = 0; i < grid.length; i++) {
-					grid[i].lost = true
-				}
-				update()
-			} else if (hasWon()) {
-				gameOver = true
-				winner = document.getElementById("winner")
-				winner.style.display = "inline"
-				for (let i = 0; i < grid.length; i++) {
-					grid[i].won = true
-				}
+		if (grid[index(x, y)].bomb) {
+			gameOver = true;
+			loser = document.getElementById("loser")
+			loser.style.display = "inline"
+			for (let i = 0; i < grid.length; i++) {
+				grid[i].lost = true
 			}
-
+			update()
+		} else if (hasWon()) {
+			gameOver = true
+			winner = document.getElementById("winner")
+			winner.style.display = "inline"
+			for (let i = 0; i < grid.length; i++) {
+				grid[i].won = true
+			}
 		}
 	}
 	update()
